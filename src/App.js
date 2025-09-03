@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import SplashScreen from "./SplashScreen";
+import Toast from "./Toast";
+import { LANGS } from "./langs";
+
 /**
  * Aarogya Sahayak – Healthcare Mobile Application
  * Developed by CODE4CARE (C4C)
@@ -27,144 +30,6 @@ const decrypt = (text) => {
   try { return decodeURIComponent(escape(atob(text))); } catch { return ""; }
 };
 
-const LANGS = {
-  en: {
-    app: "Aarogya Sahayak",
-    tagline: "by CODE4CARE",
-    consult: "Doctor Consult",
-    medicine: "Medicine Finder",
-    records: "Health Records",
-    symptom: "Symptom Checker",
-    speak: "Voice Navigation",
-    sos: "EMERGENCY",
-    offline: "Offline mode - actions will sync when connected",
-    online: "Online",
-    disasterOn: "Emergency Mode ON",
-    disasterOff: "Emergency Mode OFF",
-    voiceHint: "Say: 'Doctor', 'Medicine', 'Records', or 'Symptoms'",
-    lastUpdated: "Last updated",
-    refresh: "Refresh",
-    noInternet: "No connection - showing cached data",
-    queuePlaced: "Request queued. You'll be contacted when online.",
-    startCall: "Video Call",
-    startAudio: "Audio Call",
-    schedule: "Schedule Later",
-    confirm: "Confirm",
-    queued: "Pending Requests",
-    none: "None",
-    addVisit: "Add Visit",
-    doctorName: "Doctor name",
-    notes: "Notes",
-    save: "Save",
-    sync: "Sync",
-    synced: "Synced",
-    otpLogin: "Login with Phone + OTP",
-    phone: "Phone",
-    sendOtp: "Send OTP",
-    enterOtp: "Enter OTP",
-    verify: "Verify",
-    logout: "Logout",
-    fever: "Do you have fever?",
-    cough: "Do you have cough?",
-    yes: "Yes",
-    no: "No",
-    advice1: "Likely viral fever. Rest, hydrate, consult if >3 days.",
-    advice2: "Monitor symptoms. Consult if worsening.",
-    emergencyHelp: "Emergency Help",
-    callHelpline: "Call Helpline",
-    smsOnly: "Sending emergency SMS",
-  },
-  hi: {
-    app: "आरोग्य सहायक",
-    consult: "डॉक्टर से बात करें",
-    medicine: "दवाई",
-    records: "स्वास्थ्य रिकॉर्ड",
-    symptom: "लक्षण जाँच",
-    speak: "आवाज नेविगेशन",
-    sos: "आपातकाल",
-    offline: "ऑफलाइन मोड - कनेक्शन आने पर सिंक होगा",
-    online: "ऑनलाइन",
-    disasterOn: "आपदा मोड चालू",
-    disasterOff: "आपदा मोड बंद",
-    voiceHint: "कहें: 'डॉक्टर', 'दवाई', 'रिकॉर्ड', 'लक्षण'",
-    lastUpdated: "आखिरी अपडेट",
-    refresh: "रिफ्रेश",
-    noInternet: "नेट नहीं - कैश्ड डेटा दिख रहा है",
-    queuePlaced: "अनुरोध कतार में। ऑनलाइन आने पर कॉल करेंगे।",
-    startCall: "वीडियो कॉल",
-    startAudio: "ऑडियो कॉल",
-    schedule: "बाद में शेड्यूल",
-    confirm: "कन्फर्म",
-    queued: "लंबित अनुरोध",
-    none: "कोई नहीं",
-    addVisit: "विज़िट जोड़ें",
-    doctorName: "डॉक्टर नाम",
-    notes: "नोट्स",
-    save: "सेव",
-    sync: "सिंक",
-    synced: "सिंक हो गया",
-    otpLogin: "फोन + OTP से लॉगिन",
-    phone: "फ़ोन",
-    sendOtp: "OTP भेजें",
-    enterOtp: "OTP डालें",
-    verify: "वेरिफाई",
-    logout: "लॉगआउट",
-    fever: "क्या बुखार है?",
-    cough: "क्या खाँसी है?",
-    yes: "हाँ",
-    no: "नहीं",
-    advice1: "वायरल बुखार लगता है। आराम करें, पानी पिएं।",
-    advice2: "लक्षण देखते रहें। बिगड़े तो डॉक्टर से मिलें।",
-    emergencyHelp: "आपातकाल सहायता",
-    callHelpline: "हेल्पलाइन कॉल",
-    smsOnly: "आपातकाल SMS भेज रहे हैं",
-  },
-  pa: {         
-    app: "ਆਰੋਗਿਆ ਸਹਾਇਕ",
-    consult: "ਡਾਕਟਰ ਨਾਲ ਸਲਾਹ ਕਰੋ",
-    medicine: "ਦਵਾਈ ਲੱਭੋ",
-    records: "ਸਿਹਤ ਰਿਕਾਰਡ",
-    symptom: "ਲਛਣ ਜਾਂਚ",
-    speak: "ਆਵਾਜ਼ ਨਾਲ ਨੇਵੀਗੇਸ਼ਨ",
-    sos: "ਐਮਰਜੈਂਸੀ",
-    offline: "ਆਫਲਾਈਨ ਮੋਡ - ਜੁੜਨ 'ਤੇ ਸਿੰਕ ਹੋਵੇਗਾ",
-    online: "ਆਨਲਾਈਨ",
-    disasterOn: "ਐਮਰਜੈਂਸੀ ਮੋਡ ਚਾਲੂ",
-    disasterOff: "ਐਮਰਜੈਂਸੀ ਮੋਡ ਬੰਦ",
-    voiceHint: "ਕਹੋ: 'ਡਾਕਟਰ', 'ਦਵਾਈ', 'ਰਿਕਾਰਡ', ਜਾਂ 'ਲਛਣ'",
-    lastUpdated: "ਆਖਰੀ ਅੱਪਡੇਟ",
-    refresh: "ਰੀਫਰੈਸ਼",
-    noInternet: "ਕੋਈ ਕਨੈਕਸ਼ਨ ਨਹੀਂ - ਕੈਸ਼ਡ ਡਾਟਾ ਦਿਖਾਇਆ ਜਾ ਰਿਹਾ ਹੈ",
-    queuePlaced: "ਰਿਕਵੇਸਟ ਕਤਾਰ ਵਿੱਚ। ਜੁੜਨ 'ਤੇ ਸੰਪਰਕ ਕੀਤਾ ਜਾਵੇਗਾ।",
-    startCall: "ਵੀਡੀਓ ਕਾਲ",
-    startAudio: "ਆਡੀਓ ਕਾਲ",
-    schedule: "ਬਾਅਦ ਵਿੱਚ ਸ਼ਡਿਊਲ ਕਰੋ",
-    confirm: "ਪੁਸ਼ਟੀ ਕਰੋ",
-    queued: "ਬਕਾਇਆ ਬੇਨਤੀਆਂ",
-    none: "ਕੋਈ ਨਹੀਂ",
-    addVisit: "ਵਿਜ਼ਿਟ ਜੋੜੋ",
-    doctorName: "ਡਾਕਟਰ ਦਾ ਨਾਂ",
-    notes: "ਟਿੱਪਣੀਆਂ",
-    save: "ਸੰਭਾਲੋ",
-    sync: "ਸਿੰਕ ਕਰੋ",
-    synced: "ਸਿੰਕ ਹੋ ਗਿਆ",
-    otpLogin: "ਫੋਨ + ਓਟੀਪੀ ਨਾਲ ਲੌਗਇਨ ਕਰੋ",
-    phone: "ਫ਼ੋਨ",
-    sendOtp: "ਓਟੀਪੀ ਭੇਜੋ",
-    enterOtp: "ਓਟੀਪੀ ਦਾਖਲ ਕਰੋ",
-    verify: "ਤਸਦੀਕ ਕਰੋ",
-    logout: "ਲੌਗਆਊਟ",
-    fever: "ਕੀ ਤੁਹਾਨੂੰ ਬੁਖਾਰ ਹੈ?",
-    cough: "ਕੀ ਤੁਹਾਨੂੰ ਖਾਂਸੀ ਹੈ?",
-    yes: "ਹਾਂ",
-    no: "ਨਹੀਂ",
-    advice1: "ਸੰਭਵਤ: ਵਾਇਰਲ ਬੁਖਾਰ। ਆਰਾਮ ਕਰੋ, ਪਾਣੀ ਪੀਓ।",
-    advice2: "ਲਛਣਾਂ 'ਤੇ ਨਿਗਰਾਨੀ ਕਰੋ। ਖਰਾਬ ਹੋਵੇ ਤਾਂ ਡਾਕਟਰ ਨੂੰ ਮਿਲੋ।",
-    emergencyHelp: "ਐਮਰਜੈਂਸੀ ਸਹਾਇਤਾ",
-    callHelpline: "ਹੈਲਪਲਾਈਨ ਕਾਲ ਕਰੋ",
-    smsOnly: "ਐਮਰਜੈਂਸੀ SMS ਭੇਜ ਰਹੇ ਹਾਂ",
-  },
-};
 
 const useOnline = () => {
   const [online, setOnline] = useState(navigator.onLine);
@@ -181,7 +46,6 @@ const useOnline = () => {
 export default function App() {
   const [loading, setLoading] = useState(true);
 
-
   const [lang, setLang] = useState(storage.get("app_lang", "en"));
   const t = LANGS[lang];
   useEffect(() => storage.set("app_lang", lang), [lang]);
@@ -191,10 +55,30 @@ export default function App() {
   const [disaster, setDisaster] = useState(storage.get("disaster_mode", false));
   useEffect(() => storage.set("disaster_mode", disaster), [disaster]);
 
+  const [toastMsg, setToastMsg] = useState("");
+
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000); // 3 seconds splash
+    const timer = setTimeout(() => setLoading(false), 3000); 
     return () => clearTimeout(timer);
   }, []);
+  useEffect(() => {
+  if ('serviceWorker' in navigator) 
+    {
+      navigator.serviceWorker.register('/service-worker.js')
+      .then(() => console.log('Service Worker registered'))
+      .catch((err) => console.error('Service Worker registration failed:', err));
+    }
+  }, []);
+
+  useEffect(() => {
+  if (toastMsg) {
+    const timer = setTimeout(() => setToastMsg(""), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [toastMsg]);
+
+
+
 
   if (loading) return <SplashScreen />;
 
@@ -211,6 +95,7 @@ export default function App() {
         {screen === "sos" && <SOS t={t} back={() => setScreen("home")} />}
 
         <VoiceNav t={t} onCommand={(cmd) => navigateByVoice(cmd, setScreen)} />
+          <Toast message={toastMsg} onClose={() => setToastMsg("")}   />
       </div>
     </div>
   );
@@ -258,7 +143,11 @@ function Header({ t, lang, setLang, online, disaster, setDisaster }) {
 
 function Home({ t, goto }) {
   const Tile = ({ label, icon, to, colors }) => (
-    <button onClick={()=>goto(to)} className={`rounded-2xl w-full h-32 bg-gradient-to-br ${colors} hover:scale-105 transition-all flex flex-col items-center justify-center gap-3 shadow-lg`}>
+    <button 
+    onClick={()=>goto(to)} 
+    className={`rounded-2xl w-full h-32 bg-gradient-to-br ${colors} hover:scale-105 transition-all flex flex-col items-center justify-center gap-3 shadow-lg`}
+    aria-label={`Navigate to ${label}`}
+    >
       <span className="text-4xl">{icon}</span>
       <span className="font-semibold text-white text-sm">{label}</span>
     </button>
@@ -285,7 +174,7 @@ function Home({ t, goto }) {
   );
 }
 
-function Consult({ t, back, online }) {
+function Consult({ t, back, online, setToastMsg }) {
   const [queued, setQueued] = useState(storage.get("consult_queue", []));
   const [time, setTime] = useState("");
 
@@ -294,7 +183,7 @@ function Consult({ t, back, online }) {
     const updated = [...queued, item];
     setQueued(updated);
     storage.set("consult_queue", updated);
-    alert(online ? `${type} scheduled!` : t.queuePlaced);
+    setToastMsg(online ? `${type} scheduled!` : t.queuePlaced);
   };
 
   return (
@@ -390,7 +279,7 @@ function sampleMeds(){
   ];
 }
 
-function Records({ t, back }) {
+function Records({ t, back, setToastMsg }) {
   const [authed, setAuthed] = useState(storage.get("user_authed", false));
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -426,7 +315,7 @@ function Records({ t, back }) {
   const startVoiceInput = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      alert("Voice input is not supported by your browser.");
+      setToastMsg("Voice input is not supported by your browser.");
       return;
     }
     if (!recRef.current) {
@@ -440,9 +329,9 @@ function Records({ t, back }) {
 
     recRef.current.onerror = (event) => {
       if (event.error === "not-allowed" || event.error === "permission-denied") {
-        alert("Permission to use microphone was denied. Please allow microphone access.");
+        setToastMsg("Permission to use microphone was denied. Please allow microphone access.");
       } else {
-        alert(`Speech recognition error: ${event.error}`);
+        setToastMsg(`Speech recognition error: ${event.error}`);
       }
     };
 
@@ -512,6 +401,7 @@ function Records({ t, back }) {
           required
           value={doctorName}
           onChange={e => setDoctorName(e.target.value)}
+          aria-label="Doctor name"
           />
           <button
           type="button"
@@ -527,7 +417,7 @@ function Records({ t, back }) {
             </form>
 
       <div className="flex gap-2 mb-4">
-        <button onClick={()=>alert(t.synced)} className="rounded-xl bg-green-600 text-white px-4 py-2">{t.sync}</button>
+        <button onClick={()=>setToastMsg(t.synced)} className="rounded-xl bg-green-600 text-white px-4 py-2">{t.sync}</button>
         <button onClick={()=>{ storage.set("user_authed", false); setAuthed(false); }} className="rounded-xl bg-gray-100 px-4 py-2">{t.logout}</button>
       </div>
 
@@ -615,12 +505,12 @@ function SOS({ t, back }){
 }
 
 
-function VoiceNav({ t, onCommand }){
+function VoiceNav({ t, onCommand, setToastMsg }){
   const [active, setActive] = useState(false);
 
   const start = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SR){ alert("Voice not supported"); return; }
+    if(!SR){ setToastMsg("Voice not supported"); return; }
     const rec = new SR();
     rec.lang = "en-IN";
     rec.onresult = (e)=>{
@@ -634,16 +524,28 @@ function VoiceNav({ t, onCommand }){
   };
 
   return (
-    <div className="mt-6 flex justify-between items-center">
+  <div className="mt-6 flex items-center gap-2">
+    {active && (
+      <span
+      className="w-3 h-3 bg-green-500 rounded-full animate-ping"
+      aria-label="Listening indicator"
+      ></span>
+      )}
       <p className="text-xs text-gray-500">{t.speak}</p>
-      <button onClick={start} className={`rounded-full px-4 py-2 text-sm font-medium ${active?"bg-green-600 text-white":"bg-gray-100"}`}>
+      <button
+      onClick={start}
+      className={`rounded-full px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${active ? "bg-green-600 text-white" : "bg-gray-100"}`}      
+      aria-pressed={active}
+      aria-label="Start voice command"
+      >
         🎙️
-      </button>
-    </div>
-  );
-}
+        </button>
+        </div>
+        );
+      }
 
-function navigateByVoice(text, setScreen){
+
+function navigateByVoice(text, setScreen, setToastMsg){
   const map = [
     [/doctor|consult/, "consult"],
     [/medicine|med/, "medicine"],
@@ -652,7 +554,7 @@ function navigateByVoice(text, setScreen){
     [/sos|emergency/, "sos"],
   ];
   for(const [re, scr] of map){ if(re.test(text)) { setScreen(scr); return; } }
-  alert("Try saying 'doctor', 'medicine', 'records', or 'symptoms'");
+  setToastMsg("Try saying 'doctor', 'medicine', 'records', or 'symptoms'");
 }
 
 function Screen({ title, back, children }){
