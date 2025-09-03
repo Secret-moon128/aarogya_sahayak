@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import SplashScreen from "./SplashScreen";
 /**
  * Aarogya Sahayak – Healthcare Mobile Application
  * Developed by CODE4CARE (C4C)
@@ -178,6 +179,9 @@ const useOnline = () => {
 };
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+
+
   const [lang, setLang] = useState(storage.get("app_lang", "en"));
   const t = LANGS[lang];
   useEffect(() => storage.set("app_lang", lang), [lang]);
@@ -186,6 +190,13 @@ export default function App() {
   const [screen, setScreen] = useState("home");
   const [disaster, setDisaster] = useState(storage.get("disaster_mode", false));
   useEffect(() => storage.set("disaster_mode", disaster), [disaster]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000); // 3 seconds splash
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) return <SplashScreen />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
