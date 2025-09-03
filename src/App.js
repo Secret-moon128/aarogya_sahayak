@@ -199,8 +199,8 @@ export default function App() {
   if (loading) return <SplashScreen />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl p-6">
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-2 md:p-6">
+    <div className="w-full max-w-xs sm:max-w-md md:max-w-xl lg:max-w-3xl rounded-3xl bg-white shadow-2xl p-3 sm:p-6 md:p-8">
         <Header lang={lang} setLang={setLang} t={t} online={online} disaster={disaster} setDisaster={setDisaster} />
 
         {screen === "home" && <Home t={t} goto={setScreen} />}
@@ -266,7 +266,7 @@ function Home({ t, goto }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Tile label={t.consult} icon="🩺" to="consult" colors="from-blue-500 to-blue-600" />
         <Tile label={t.medicine} icon="💊" to="medicine" colors="from-green-500 to-green-600" />
         <Tile label={t.records} icon="📋" to="records" colors="from-purple-500 to-purple-600" />
