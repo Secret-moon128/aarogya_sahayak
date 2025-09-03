@@ -413,26 +413,49 @@ function Records({ t, back }) {
     const enc = storage.get("records_enc", null);
     if(!enc) return [];
     const plain = decrypt(enc);
-    try { return JSON.parse(plain) } catch { return [] }
+    try { 
+      return JSON.parse(plain) 
+    } catch { 
+      return []; 
+    }
   });
 
   const [doctorName, setDoctorName] = useState("");
+  const recRef = useRef(null);
 
   const startVoiceInput = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      alert("Voice input only works in Chrome/Edge.");
+      alert("Voice input is not supported by your browser.");
       return;
     }
-    const rec = new SR();
-    rec.lang = "en-IN";
-    rec.onresult = (e) => {
-      const spokenText = e.results[0][0].transcript;
+    if (!recRef.current) {
+    recRef.current = new SR();
+    recRef.current.lang = "en-IN";
+
+    recRef.current.onresult = (event) => {
+      const spokenText = event.results[0][0].transcript;
       setDoctorName(spokenText);
     };
-    rec.start();
-  };
 
+    recRef.current.onerror = (event) => {
+      if (event.error === "not-allowed" || event.error === "permission-denied") {
+        alert("Permission to use microphone was denied. Please allow microphone access.");
+      } else {
+        alert(`Speech recognition error: ${event.error}`);
+      }
+    };
+
+    recRef.current.onend = () => {
+    };
+  }
+
+  try {
+    recRef.current.start();
+  } catch (e) {
+    console.error("SpeechRecognition start error:", e);
+  }
+};
 
   const persist = (data) => storage.set("records_enc", encrypt(JSON.stringify(data)));
 
@@ -492,7 +515,7 @@ function Records({ t, back }) {
           />
           <button
           type="button"
-          onClick={() => startVoiceInput()}
+          onClick={startVoiceInput}
           className="rounded-xl bg-gray-200 px-3 py-2"
           title="Speak doctor name"
           >
